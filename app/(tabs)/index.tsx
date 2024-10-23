@@ -1,6 +1,13 @@
+import { useFocusEffect, useRouter } from "expo-router";
 import { StyleSheet, View, Text } from "react-native";
 
 export default function HomeScreen() {
+  const router = useRouter();
+
+  useFocusEffect(() => {
+    router.navigate("/tab2");
+  });
+
   return (
     <View style={styles.container}>
       <Text style={styles.mainText}>React Native Spring Practice</Text>

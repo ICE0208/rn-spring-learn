@@ -42,6 +42,18 @@ export default function DrawerLayout() {
           ),
         }}
       />
+      <Drawer.Screen
+        name="skeleton-ui"
+        options={{
+          title: "Skeleton UI",
+          drawerIcon: ({ color, focused }) => (
+            <TabBarIcon
+              name={focused ? "code-slash" : "code-slash-outline"}
+              color={color}
+            />
+          ),
+        }}
+      />
     </Drawer>
   );
 }

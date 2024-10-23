@@ -5,7 +5,7 @@ export default function HomeScreen() {
   const router = useRouter();
 
   useFocusEffect(() => {
-    router.navigate("/toggle");
+    router.navigate("/skeleton-ui");
   });
 
   return (

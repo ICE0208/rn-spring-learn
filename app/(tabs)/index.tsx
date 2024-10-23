@@ -5,7 +5,7 @@ export default function HomeScreen() {
   const router = useRouter();
 
   useFocusEffect(() => {
-    router.navigate("/tab2");
+    router.navigate("/toggle");
   });
 
   return (

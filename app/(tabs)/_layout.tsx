@@ -30,6 +30,18 @@ export default function DrawerLayout() {
           ),
         }}
       />
+      <Drawer.Screen
+        name="toggle"
+        options={{
+          title: "Toggle",
+          drawerIcon: ({ color, focused }) => (
+            <TabBarIcon
+              name={focused ? "code-slash" : "code-slash-outline"}
+              color={color}
+            />
+          ),
+        }}
+      />
     </Drawer>
   );
 }

@@ -54,6 +54,18 @@ export default function DrawerLayout() {
           ),
         }}
       />
+      <Drawer.Screen
+        name="skeleton-list"
+        options={{
+          title: "Skeleton List",
+          drawerIcon: ({ color, focused }) => (
+            <TabBarIcon
+              name={focused ? "code-slash" : "code-slash-outline"}
+              color={color}
+            />
+          ),
+        }}
+      />
     </Drawer>
   );
 }

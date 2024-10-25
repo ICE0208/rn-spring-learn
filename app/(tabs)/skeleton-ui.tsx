@@ -1,3 +1,5 @@
+import { useFocusEffect } from "@react-navigation/native";
+import { useCallback } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { animated, useSpring } from "react-spring";
 
@@ -6,13 +8,20 @@ const contentColor = "#919191";
 
 export default function SkeletonUI() {
   const AnimatedBox = animated(View);
-  const springs = useSpring({
-    from: { opacity: 0.85 },
-    to: { opacity: 0.45 },
-    loop: { reverse: true },
-    config: { duration: 700 },
-    // reverse: true,
-  });
+  const [springs, api] = useSpring(() => ({ from: { opacity: 0.85 } }));
+
+  useFocusEffect(
+    useCallback(() => {
+      api.start({
+        from: { opacity: 0.85 },
+        to: { opacity: 0.45 },
+        loop: { reverse: true },
+        config: { duration: 700 },
+      });
+
+      return () => api.stop();
+    }, [api])
+  );
 
   return (
     <View style={styles.container}>

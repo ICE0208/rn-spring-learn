@@ -1,3 +1,5 @@
+import { useFocusEffect } from "@react-navigation/native";
+import { useCallback } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 import { animated, useSpring } from "react-spring";
 
@@ -30,12 +32,20 @@ const styles = StyleSheet.create({
 
 const Item = ({ index = 0 }: { index?: number }) => {
   const AnimatedView = animated(View);
-  const springs = useSpring({
-    from: { opacity: 0.85 },
-    to: { opacity: 0.45 },
-    loop: { reverse: true },
-    config: { duration: 700 },
-  });
+  const [springs, api] = useSpring(() => ({ from: { opacity: 0.85 } }));
+
+  useFocusEffect(
+    useCallback(() => {
+      api.start({
+        from: { opacity: 0.85 },
+        to: { opacity: 0.45 },
+        loop: { reverse: true },
+        config: { duration: 700 },
+      });
+
+      return () => api.stop();
+    }, [api])
+  );
 
   const seed = 540;
   const [minTitleWidth, maxTitleWidth] = [120, 180];

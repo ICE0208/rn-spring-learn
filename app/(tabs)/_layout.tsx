@@ -66,6 +66,18 @@ export default function DrawerLayout() {
           ),
         }}
       />
+      <Drawer.Screen
+        name="refresh"
+        options={{
+          title: "Refresh",
+          drawerIcon: ({ color, focused }) => (
+            <TabBarIcon
+              name={focused ? "code-slash" : "code-slash-outline"}
+              color={color}
+            />
+          ),
+        }}
+      />
     </Drawer>
   );
 }

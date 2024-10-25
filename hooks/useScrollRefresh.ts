@@ -8,8 +8,6 @@ const useScrollRefresh = (fetchData: () => Promise<void>) => {
   const [canRefresh, setCanRefresh] = useState(false);
   const scrollY = useRef(0);
 
-  console.log(canRefresh);
-
   const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     scrollY.current = event.nativeEvent.contentOffset.y;
     setCanRefresh(scrollY.current <= refreshPoint);

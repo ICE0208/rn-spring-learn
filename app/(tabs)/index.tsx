@@ -2,11 +2,11 @@ import { useFocusEffect, useRouter } from "expo-router";
 import { StyleSheet, View, Text } from "react-native";
 
 export default function HomeScreen() {
-  const router = useRouter();
+  // const router = useRouter();
 
-  useFocusEffect(() => {
-    router.navigate("/refresh");
-  });
+  // useFocusEffect(() => {
+  //   router.navigate("/refresh");
+  // });
 
   return (
     <View style={styles.container}>

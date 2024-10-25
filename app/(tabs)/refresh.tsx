@@ -1,5 +1,5 @@
 import useScrollRefresh from "@/hooks/useScrollRefresh";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { FlatList, Text, View, ActivityIndicator } from "react-native";
 import { animated, useSpring } from "react-spring";
 import Icons from "@expo/vector-icons/MaterialIcons";
@@ -12,7 +12,14 @@ const App = () => {
   const fetchData = async () => {
     await new Promise<void>((resolve) => {
       setTimeout(() => {
-        setData(Array.from({ length: 20 }, (_, i) => `Item ${i + 1}`));
+        setData(
+          Array.from({ length: 20 }, (_, i) => {
+            const now = new Date().toLocaleTimeString("en-GB", {
+              hour12: false,
+            });
+            return `Item ${i + 1} - ${now} updated`;
+          })
+        );
         resolve();
       }, 1500); // 1초 지연
     });
@@ -32,42 +39,61 @@ const App = () => {
     useScrollRefresh(fetchData);
 
   const AnimatedIcons = animated(Icons);
+  const AnimatedView = animated(View);
   const [springs, api] = useSpring(() => ({
     marginTop: 0,
     opacity: 0,
     rotate: 0,
   }));
-  const [animating, setAnimating] = useState(false);
+  const [springs2, api2] = useSpring(() => ({ y: 0 }));
+
+  const animationStep = useRef<"READY" | "CAN_REFRESH" | "IS_REFRESHING">(
+    "READY"
+  );
 
   useEffect(() => {
-    if (canRefresh && !animating && !isRefreshing) {
+    if (canRefresh && animationStep.current === "READY") {
       api.start({
         opacity: 1,
-        marginTop: 40,
+        marginTop: 25,
+        rotate: 360,
+        config: { duration: 300 },
       });
+      animationStep.current = "CAN_REFRESH";
     }
 
-    if (isRefreshing) {
+    if (isRefreshing && animationStep.current === "CAN_REFRESH") {
+      api.start({ cancel: "rotate" });
+      const curRotateValue = springs.rotate.get();
       api.start({
-        from: { rotate: 0 },
-        to: { rotate: 360 },
+        from: { rotate: curRotateValue },
+        to: { rotate: curRotateValue + 360 },
         config: { duration: 800 },
         loop: true, // 명시적으로 무한 반복
       });
-      setAnimating(true);
-    } else {
-      setAnimating(false);
+      api2.start({
+        y: 40,
+      });
+      animationStep.current = "IS_REFRESHING";
+    }
+
+    if (!isRefreshing && animationStep.current === "IS_REFRESHING") {
+      api.stop(); // 명시적으로 애니메이션 중지
+      api.start({ opacity: 0, marginTop: 0, rotate: 0 });
+      api2.start({ y: 0 });
+      animationStep.current = "READY";
+    }
+
+    if (!canRefresh && animationStep.current === "CAN_REFRESH") {
+      api.start({
+        opacity: 0,
+        marginTop: 0,
+        rotate: 0,
+        config: { duration: 300 },
+      });
+      animationStep.current = "READY";
     }
   }, [canRefresh, isRefreshing]);
-
-  useEffect(() => {
-    if (animating === false) {
-      api.stop(); // 명시적으로 애니메이션 중지
-      setAnimating(false);
-      api.start({ opacity: 0, marginTop: 0, rotate: 0 });
-      setAnimating(false);
-    }
-  }, [animating]);
 
   // 로딩 화면 표시
   if (isInitialLoading) {
@@ -84,38 +110,39 @@ const App = () => {
 
   return (
     <View style={{ flex: 1 }}>
-      <FlatList
-        data={data}
-        renderItem={({ item }) => (
-          <View
-            style={{ padding: 20, borderBottomWidth: 1, borderColor: "#ccc" }}
-          >
-            <Text>{item}</Text>
-          </View>
-        )}
-        onScrollEndDrag={handleScrollEndDrag}
-        onScroll={handleScroll}
-        keyExtractor={(item, index) => index.toString()}
-        ListHeaderComponent={
-          <View
-            style={{
-              position: "absolute",
-              alignItems: "center",
-              width: "100%",
-              top: -30,
-            }}
-          >
-            <AnimatedIcons
-              name="refresh"
-              size={34}
-              color="black"
-              style={{
-                ...springs,
-              }}
-            />
-          </View>
-        }
-      />
+      <View
+        style={{
+          position: "relative",
+          alignItems: "center",
+          width: "100%",
+        }}
+      >
+        <AnimatedIcons
+          name="refresh"
+          size={28}
+          color="black"
+          style={{
+            position: "absolute",
+            top: -10,
+            ...springs,
+          }}
+        />
+      </View>
+      <AnimatedView style={{ ...springs2 }}>
+        <FlatList
+          data={data}
+          renderItem={({ item }) => (
+            <View
+              style={{ padding: 20, borderBottomWidth: 1, borderColor: "#ccc" }}
+            >
+              <Text>{item}</Text>
+            </View>
+          )}
+          onScrollEndDrag={handleScrollEndDrag}
+          onScroll={handleScroll}
+          keyExtractor={(item, index) => index.toString()}
+        />
+      </AnimatedView>
     </View>
   );
 };

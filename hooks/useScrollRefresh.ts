@@ -6,14 +6,16 @@ const refreshPoint = -40;
 const useScrollRefresh = (fetchData: () => Promise<void>) => {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [canRefresh, setCanRefresh] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
   const scrollY = useRef(0);
 
   const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     scrollY.current = event.nativeEvent.contentOffset.y;
-    setCanRefresh(scrollY.current <= refreshPoint);
+    setCanRefresh(scrollY.current <= refreshPoint && isDragging);
   };
 
   const handleScrollEndDrag = async () => {
+    setIsDragging(false);
     if (scrollY.current <= refreshPoint && !isRefreshing) {
       setIsRefreshing(true);
       await fetchData(); // 데이터 로드가 끝날 때까지 기다림
@@ -21,7 +23,17 @@ const useScrollRefresh = (fetchData: () => Promise<void>) => {
     }
   };
 
-  return { isRefreshing, handleScroll, handleScrollEndDrag, canRefresh };
+  const handleScrollStartDrag = () => {
+    setIsDragging(true);
+  };
+
+  return {
+    isRefreshing,
+    handleScroll,
+    handleScrollEndDrag,
+    canRefresh,
+    handleScrollStartDrag,
+  };
 };
 
 export default useScrollRefresh;

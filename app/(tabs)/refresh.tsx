@@ -35,8 +35,13 @@ const App = () => {
   }, []);
 
   // useScrollRefresh 훅 사용하여 스크롤 새로고침 구현
-  const { isRefreshing, handleScroll, handleScrollEndDrag, canRefresh } =
-    useScrollRefresh(fetchData);
+  const {
+    isRefreshing,
+    handleScroll,
+    handleScrollEndDrag,
+    canRefresh,
+    handleScrollStartDrag,
+  } = useScrollRefresh(fetchData);
 
   const AnimatedIcons = animated(Icons);
   const AnimatedView = animated(View);
@@ -138,6 +143,7 @@ const App = () => {
               <Text>{item}</Text>
             </View>
           )}
+          onScrollBeginDrag={handleScrollStartDrag}
           onScrollEndDrag={handleScrollEndDrag}
           onScroll={handleScroll}
           keyExtractor={(item, index) => index.toString()}
